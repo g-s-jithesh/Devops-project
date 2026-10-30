@@ -1,0 +1,2 @@
+aws_region: ap-south-1  # keep in sync with inventory/aws_ec2.yml
+instance_type: t3.medium # 4 GB: Jenkins + k3s + Maven builds don't fit in a t2/t3.micro
