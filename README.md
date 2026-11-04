@@ -5,9 +5,9 @@ packaged with **Docker**, run on **Kubernetes (k3s)** on an **AWS EC2** Linux se
 configures, and shipped on every `git push` by a **Jenkins** CI/CD pipeline.
 
 ```
- Laptop (WSL)                               AWS ap-south-1
+ Laptop (WSL)                               AWS us-east-1
  ────────────                               ──────────────────────────────────────────────────────────
- ansible-playbook site.yml ──AWS API──────▶ EC2 t3.medium, Ubuntu 24.04   (SG: 22, 8080 = your IP; 30080 = all)
+ ansible-playbook site.yml ──AWS API──────▶ EC2 m7i-flex.large, Ubuntu 24.04  (SG: 22, 8080 = your IP; 30080 = all)
                            ──SSH──────────▶  ├─ Jenkins :8080 ──polls──▶ GitHub repo
  git push ──▶ GitHub                         │     mvn verify → docker build → k3s ctr import → ansible deploy.yml
                                              ├─ Docker engine
@@ -55,7 +55,7 @@ ansible/requirements.yml      Ansible collections
 ### 2. Control machine (WSL Ubuntu)
 ```bash
 sudo apt install -y ansible python3-boto3 awscli
-aws configure                      # access key from step 1, region ap-south-1
+aws configure                      # access key from step 1, region us-east-1
 cd ~ && git clone <your-repo-url> nlp-api && cd nlp-api/ansible
 ansible-galaxy collection install -r requirements.yml
 ```
@@ -80,7 +80,7 @@ The pipeline runs **Maven build & test → Docker image → load into Kubernetes
 After the first build Jenkins polls the repo every ~2 minutes, so every `git push` redeploys with a rolling update.
 
 ### 5. Tear down (stop the bill)
-`t3.medium` is not free-tier (a few cents per hour). When you're done:
+`m7i-flex.large` is free-tier eligible, but free hours/credits run out if it stays on. When you're done:
 ```bash
 ansible-playbook teardown.yml
 ```
